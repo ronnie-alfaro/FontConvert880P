@@ -3,9 +3,12 @@ import io
 import json
 import math
 import re
+from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request, send_file
 from PIL import Image, ImageDraw, ImageFont
+
+TRANSLATIONS = json.loads(Path(__file__).with_name('translations.json').read_text())
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 12 * 1024 * 1024
@@ -140,7 +143,7 @@ def c_source(cfg, data):
 
 @app.get('/')
 def index():
-    return render_template('index.html', initial=defaults())
+    return render_template('index.html', initial=defaults(), translations=TRANSLATIONS)
 
 
 @app.get('/health')
@@ -156,13 +159,23 @@ def load():
     return jsonify(parse_definition(file.read().decode('utf-8-sig')))
 
 
+def export_name(cfg, extension, original=None):
+    """Use the source font stem and output cell dimensions for every download."""
+    name = (original or cfg['fontfamily']).replace('\\', '/').rsplit('/', 1)[-1]
+    name = re.sub(r'\.(ttf|otf)$', '', name, flags=re.IGNORECASE)
+    name = re.sub(r'[^A-Za-z0-9._-]+', '-', name).strip('.-') or 'font'
+    return f"{name[:120]}-{cfg['bitmapwidth']}x{cfg['bitmapheight']}.{extension}"
+
+
 @app.post('/api/<action>')
 def convert(action):
     if action not in ('preview', 'definition', 'binary', 'source'):
         return jsonify(error='Acción desconocida.'), 404
     cfg = validate(json.loads(request.form.get('config', '{}')))
+    uploaded = request.files.get('font')
+    original = uploaded.filename if uploaded else None
     if action == 'definition':
-        return send_file(io.BytesIO(definition(cfg)), mimetype='text/plain', as_attachment=True, download_name='font.font880')
+        return send_file(io.BytesIO(definition(cfg)), mimetype='text/plain', as_attachment=True, download_name=export_name(cfg, 'font880', original))
     uploaded = request.files.get('font')
     bitmaps = render(cfg, uploaded.read() if uploaded else None)
     if action == 'preview':
@@ -170,8 +183,8 @@ def convert(action):
                        bytes=len(pack(bitmaps)))
     data = pack(bitmaps)
     if action == 'source':
-        return send_file(io.BytesIO(c_source(cfg, data)), mimetype='text/plain', as_attachment=True, download_name='font.c')
-    return send_file(io.BytesIO(data), mimetype='application/octet-stream', as_attachment=True, download_name='font.rmsfont')
+        return send_file(io.BytesIO(c_source(cfg, data)), mimetype='text/plain', as_attachment=True, download_name=export_name(cfg, 'c', original))
+    return send_file(io.BytesIO(data), mimetype='application/octet-stream', as_attachment=True, download_name=export_name(cfg, 'rmsfont', original))
 
 
 @app.errorhandler(413)
@@ -184,7 +197,10 @@ def too_large(error):
 @app.errorhandler(KeyError)
 @app.errorhandler(AttributeError)
 def invalid(error):
-    return jsonify(error=str(error) or 'Datos inválidos.'), 400
+    message = str(error)
+    if message not in TRANSLATIONS and not message.startswith(('El valor debe estar entre ', 'Carga el archivo TTF/OTF de la fuente ')):
+        message = 'Datos inválidos.'
+    return jsonify(error=message), 400
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.l
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY app.py .
+COPY app.py translations.json ./
 COPY templates templates
 RUN useradd --uid 10001 --create-home app
 USER app

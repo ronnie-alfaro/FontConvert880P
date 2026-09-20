@@ -4,7 +4,7 @@
 
 [English](README.md) · [Español](README_es.md)
 
-FontConvert880P is an independent Python implementation of the FontConvert880 workflow. It provides a Spanish-language web interface for previewing, adjusting, saving, and exporting the 95 printable ASCII characters. Docker Compose packages the server and bundled fonts in one container, so the host does not need Python or a font installation.
+FontConvert880P is an independent Python implementation of the FontConvert880 workflow. It provides an English/Spanish web interface for previewing, adjusting, saving, and exporting the 95 printable ASCII characters. Docker Compose packages the server and bundled fonts in one container, so the host does not need Python or a font installation.
 
 ## Conversion example
 
@@ -122,11 +122,11 @@ The preview and export use the same server rendering routine. Changing the sampl
 
 | Download | Contents | Use |
 | --- | --- | --- |
-| `font.font880` | Family/style metadata, font size, dimensions, global adjustments, 95 individual transforms, and border setting. | Resume editing. It contains neither the font file nor the rendered bitmaps. |
-| `font.rmsfont` | Headerless packed monochrome pixels. | Use with software expecting the RT-880 RMS font layout. |
-| `font.c` | A `const uint8_t` array, `<stdint.h>`, and ASCII comments. | Integrate the bitmap bytes into C code. |
+| `ghost-24x24.font880` | Family/style metadata, font size, dimensions, global adjustments, 95 individual transforms, and border setting. | Resume editing. It contains neither the font file nor the rendered bitmaps. |
+| `ghost-24x24.rmsfont` | Headerless packed monochrome pixels. | Use with software expecting the RT-880 RMS font layout. |
+| `ghost-24x24.c` | A `const uint8_t` array, `<stdint.h>`, and ASCII comments. | Integrate the bitmap bytes into C code. |
 
-Downloads use these default filenames; rename them to identify your font and dimensions. Export generates a file only: it does not connect to or flash a radio.
+Downloads automatically use the source font name and current cell dimensions: `ghost.ttf` at 24 × 24 produces `ghost-24x24.rmsfont`, `ghost-24x24.font880`, or `ghost-24x24.c`. Spaces and unsafe filename characters are replaced with hyphens. Export generates a file only: it does not connect to or flash a radio.
 
 To resume, open the `.font880` file using **Abrir ajustes .font880**. For an external font, load its TTF/OTF **after** opening the definition: opening settings clears the currently uploaded file. A request to load the referenced font is expected until that file is supplied. Matching fonts and styles must be provided by the user; a definition cannot recover a missing font.
 
@@ -177,7 +177,7 @@ Uploads and generated output are processed per request and are not saved as serv
 - Pillow/FreeType replaces Windows GDI+. Metrics and rasterization can differ, so imported definitions may need tuning. Pixel-identical output to the Windows tool is not guaranteed.
 - Supported cell dimensions in the editor do not establish what a specific firmware version accepts. Check the receiving software's requirements.
 - The binary layout is covered by automated tests; export has not been validated on physical radio hardware.
-- The web interface is currently in Spanish; these documents are available in English and Spanish.
+- The web interface defaults to English. Use **Language / Idioma** to switch to Spanish without losing your current work. Your choice is remembered in this browser. These documents are available in both languages; Spanish control names below correspond to the Spanish interface.
 
 ## Troubleshooting
 

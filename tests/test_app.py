@@ -36,6 +36,23 @@ class ConverterTests(unittest.TestCase):
             cfg['fontstyle'] = style
             self.assertTrue(render(cfg)[33].getbbox())
 
+    def test_download_names(self):
+        import json
+        from PIL import ImageFont
+        from pathlib import Path
+        font_data = Path(ImageFont.truetype('DejaVuSans.ttf', 24).path).read_bytes()
+        client = app.test_client()
+        for action, extension in (('definition', 'font880'), ('binary', 'rmsfont'), ('source', 'c')):
+            for width, height in ((24, 24), (16, 32)):
+                response = client.post('/api/' + action, data={
+                    'config': json.dumps({'bitmapwidth': width, 'bitmapheight': height}),
+                    'font': (io.BytesIO(font_data), 'ghost.ttf'),
+                })
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(f'ghost-{width}x{height}.{extension}', response.headers['Content-Disposition'])
+        response = client.post('/api/definition')
+        self.assertIn('DejaVu-Sans-24x24.font880', response.headers['Content-Disposition'])
+
     def test_api(self):
         client = app.test_client()
         self.assertEqual(client.get('/').status_code, 200)

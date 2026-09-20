@@ -4,7 +4,7 @@
 
 [English](README.md) · [Español](README_es.md)
 
-FontConvert880P es una implementación independiente en Python del flujo de FontConvert880. Ofrece una interfaz web en español para previsualizar, ajustar, guardar y exportar los 95 caracteres ASCII imprimibles. Docker Compose reúne el servidor y las fuentes incluidas en un contenedor, por lo que el equipo anfitrión no necesita instalar Python ni fuentes.
+FontConvert880P es una implementación independiente en Python del flujo de FontConvert880. Ofrece una interfaz web en inglés y español para previsualizar, ajustar, guardar y exportar los 95 caracteres ASCII imprimibles. Docker Compose reúne el servidor y las fuentes incluidas en un contenedor, por lo que el equipo anfitrión no necesita instalar Python ni fuentes.
 
 ## Ejemplo de conversión
 
@@ -122,11 +122,11 @@ La vista previa y la exportación utilizan la misma rutina de renderizado del se
 
 | Descarga | Contenido | Uso |
 | --- | --- | --- |
-| `font.font880` | Metadatos de familia/estilo, tamaño, dimensiones, ajustes globales, 95 transformaciones individuales y opción de borde. | Continuar la edición. No contiene el archivo de fuente ni los mapas renderizados. |
-| `font.rmsfont` | Píxeles monocromáticos empaquetados, sin cabecera. | Utilizar con software que espere el formato de fuente RT-880 RMS. |
-| `font.c` | Arreglo `const uint8_t`, inclusión de `<stdint.h>` y comentarios ASCII. | Integrar los bytes de la fuente en código C. |
+| `ghost-24x24.font880` | Metadatos de familia/estilo, tamaño, dimensiones, ajustes globales, 95 transformaciones individuales y opción de borde. | Continuar la edición. No contiene el archivo de fuente ni los mapas renderizados. |
+| `ghost-24x24.rmsfont` | Píxeles monocromáticos empaquetados, sin cabecera. | Utilizar con software que espere el formato de fuente RT-880 RMS. |
+| `ghost-24x24.c` | Arreglo `const uint8_t`, inclusión de `<stdint.h>` y comentarios ASCII. | Integrar los bytes de la fuente en código C. |
 
-Las descargas utilizan esos nombres predeterminados; cámbialos para identificar tu fuente y dimensiones. Exportar solamente genera un archivo: no conecta con el radio ni instala firmware.
+Las descargas utilizan automáticamente el nombre de la fuente original y las dimensiones actuales: `ghost.ttf` a 24 × 24 produce `ghost-24x24.rmsfont`, `ghost-24x24.font880` o `ghost-24x24.c`. Los espacios y caracteres no seguros del nombre se sustituyen por guiones. Exportar solamente genera un archivo: no conecta con el radio ni instala firmware.
 
 Para continuar, abre el `.font880` mediante **Abrir ajustes .font880**. Si usas una fuente externa, carga su TTF/OTF **después** de abrir la definición: abrir ajustes elimina el archivo previamente cargado. Es normal que se solicite cargar la fuente referenciada hasta proporcionarla. El usuario debe aportar la fuente y variante correspondientes; una definición no puede recuperar una fuente ausente.
 
@@ -177,7 +177,7 @@ Los archivos cargados y generados se procesan por solicitud y no se guardan como
 - Pillow/FreeType sustituye a Windows GDI+. Las métricas y la rasterización pueden variar, por lo que una definición importada puede necesitar ajustes. No se garantiza una salida idéntica píxel por píxel a la herramienta Windows.
 - Que el editor permita unas dimensiones no demuestra que una versión concreta de firmware las admita. Comprueba los requisitos del software receptor.
 - El formato binario está cubierto por pruebas automatizadas; no se ha validado la exportación en un radio físico.
-- La interfaz web está actualmente en español; esta documentación está disponible en inglés y español.
+- La interfaz web inicia en inglés. Utiliza **Language / Idioma** para cambiar a español sin perder el trabajo actual. La preferencia se recuerda en este navegador. Esta documentación está disponible en ambos idiomas; los nombres de controles de esta guía corresponden a la interfaz en español.
 
 ## Solución de problemas
 
